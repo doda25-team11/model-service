@@ -60,5 +60,9 @@ Once its startup has finished, you can either access [localhost:8081/apidocs](ht
       "sms": "test ..."
     }
 
+## How to run the backend container (without Docker Compose)
+First create the docker image.
+$ docker build .\backend\ -t model-service
 
-
+Then, run the docker image on port 8081.
+$ docker run -p 8081:8081 model-service
