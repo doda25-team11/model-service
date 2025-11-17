@@ -45,7 +45,9 @@ COPY ./src/serve_model.py ./src/text_preprocessing.py /app/src/
 
 ENV PATH="/venv/bin:$PATH"
 
-EXPOSE 8081
+ENV MODEL_SERVICE_PORT=8081
+
+EXPOSE ${MODEL_SERVICE_PORT}
 
 # Run the main python file when the container starts
 ENTRYPOINT ["python", "/app/src/serve_model.py"]

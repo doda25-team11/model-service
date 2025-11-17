@@ -66,3 +66,7 @@ $ docker build .\backend\ -t model-service
 
 Then, run the docker image on port 8081.
 $ docker run -p 8081:8081 model-service
+
+If you wish to run it on another port, do:
+$ docker run -e MODEL_SERVICE_PORT=9000 -p 9000:9000 model-service
+So this listens on port 9000.
