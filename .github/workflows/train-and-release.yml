@@ -1,6 +1,9 @@
 name: Train and Release Model
 
 on:
+  push: # TODO this is for testing, should remove before merging.
+    branches:
+      - F9-AutomatedModelRelease
   workflow_dispatch:
 
 jobs:
