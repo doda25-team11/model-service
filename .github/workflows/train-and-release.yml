@@ -1,5 +1,8 @@
 name: Train and Release Model
 
+permissions:
+  contents: write
+
 on:
   push: # TODO this is for testing, should remove before merging.
     branches:
