@@ -23,21 +23,21 @@ jobs:
 
       # 3. Install dependencies
       - name: Install dependencies
-        run: pip install --no-cache-dir -r requirements.txt
+        run: |
+          cd backend
+          pip install --no-cache-dir -r requirements.txt
 
       # 4. Ensure output directory exists
       - name: Create output directory
-        run: mkdir -p output
+        run: mkdir -p backend/output
 
       # 5. Run training pipeline
-      - name: Run read_data.py
-        run: python src/read_data.py
-
-      - name: Run text_preprocessing.py
-        run: python src/text_preprocessing.py
-
-      - name: Run text_classification.py
-        run: python src/text_classification.py
+      - name: Run training pipeline
+        run: |
+          cd backend
+          python src/read_data.py
+          python src/text_preprocessing.py
+          python src/text_classification.py
 
       # 6. Generate model version (timestamp-based)
       - name: Generate version
@@ -61,4 +61,4 @@ jobs:
         with:
           tag_name: model-${{ env.VERSION }}
           files: |
-            output/*
+            backend/output/*
