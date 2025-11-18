@@ -4,9 +4,6 @@ permissions:
   contents: write
 
 on:
-  push: # TODO this is for testing, should remove before merging.
-    branches:
-      - F9-AutomatedModelRelease
   workflow_dispatch:
 
 jobs:
@@ -14,27 +11,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Set up Python 3.12
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      # 3. Install dependencies
       - name: Install dependencies
         run: |
           cd backend
           pip install --no-cache-dir -r requirements.txt
 
-      # 4. Ensure output directory exists
       - name: Create output directory
         run: mkdir -p backend/output
 
-      # 5. Run training pipeline
       - name: Run training pipeline
         run: |
           cd backend
@@ -42,12 +34,10 @@ jobs:
           python src/text_preprocessing.py
           python src/text_classification.py
 
-      # 6. Generate model version (timestamp-based)
       - name: Generate version
         id: version
         run: echo "VERSION=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
 
-      # 7. Create a GitHub Release
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
@@ -58,7 +48,7 @@ jobs:
           draft: false
           prerelease: false
 
-      # 8. Upload trained model files to the Release. Currently, all files are being uploaded, we could change that.
+      # Upload trained model files to the Release. Currently, all files are being uploaded, we could change that.
       - name: Upload model artifacts
         uses: softprops/action-gh-release@v1
         with:
