@@ -31,7 +31,7 @@ jobs:
         with:
           repository: ${{ env.FRONTEND_REPO }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: frontend-repo
+          path: frontend
 
       - name: Set up JDK 25 (to parse pom.xml)
         uses: actions/setup-java@v4
@@ -43,13 +43,11 @@ jobs:
         id: get_version
         working-directory: frontend
         run: |
-          RAW=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo "RAW MAVEN OUTPUT:"
-          echo "$RAW"
-
-          VERSION=$(echo "$RAW" | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Frontend version extracted: $VERSION"
 
+          # Parse MAJOR.MINOR.PATCH
           MAJOR=$(echo "$VERSION" | cut -d. -f1)
           MINOR=$(echo "$VERSION" | cut -d. -f2)
           PATCH=$(echo "$VERSION" | cut -d. -f3)
@@ -57,8 +55,6 @@ jobs:
           echo "major=$MAJOR" >> $GITHUB_OUTPUT
           echo "minor=$MINOR" >> $GITHUB_OUTPUT
           echo "patch=$PATCH" >> $GITHUB_OUTPUT
-
-          echo "Extracted version: $VERSION"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
