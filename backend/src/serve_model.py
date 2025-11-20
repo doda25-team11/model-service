@@ -5,11 +5,23 @@ import joblib
 from flask import Flask, jsonify, request
 from flasgger import Swagger
 import pandas as pd
+import os
 
 from text_preprocessing import prepare, _extract_message_len, _text_process
 
 app = Flask(__name__)
 swagger = Swagger(app)
+
+# We load the model before so that we don't have to do it every time we do a predict()
+MODEL_DIR = os.getenv("MODEL_DIR", "/app/model")
+
+# Check if the path exists, it should using the container but when running normally it doesn't so fall back to original
+if not os.path.exists(MODEL_DIR):
+    MODEL_DIR = "output"
+
+MODEL_PATH = os.path.join(MODEL_DIR, "model.joblib")
+
+model = joblib.load(MODEL_PATH)
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -37,7 +49,7 @@ def predict():
     input_data = request.get_json()
     sms = input_data.get('sms')
     processed_sms = prepare(sms)
-    model = joblib.load('output/model.joblib')
+    #model = joblib.load('output/model.joblib')
     prediction = model.predict(processed_sms)[0]
     
     res = {
@@ -49,5 +61,6 @@ def predict():
     return jsonify(res)
 
 if __name__ == '__main__':
+    port = int(os.environ.get("MODEL_SERVICE_PORT", 8081))
     #clf = joblib.load('output/model.joblib')
-    app.run(host="0.0.0.0", port=8081, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)

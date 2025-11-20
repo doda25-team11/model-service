@@ -5,6 +5,7 @@ Preprocess the data to be trained by the learning algorithm.
 import pandas as pd
 import numpy as np
 
+import os
 import string
 import nltk
 from nltk.corpus import stopwords
@@ -72,7 +73,10 @@ def _preprocess(messages):
     return preprocessed_data
 
 def prepare(message):
-    preprocessor = load('output/preprocessor.joblib')
+    MODEL_DIR = os.getenv("MODEL_DIR", "/app/model")
+    if not os.path.exists(MODEL_DIR): # Fallback if we are running locally
+        MODEL_DIR = "output"
+    preprocessor = load(os.path.join(MODEL_DIR, "preprocessor.joblib"))
     return preprocessor.transform([message])
 
 
