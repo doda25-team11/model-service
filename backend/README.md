@@ -70,3 +70,19 @@ $ docker run -p 8081:8081 model-service
 If you wish to run it on another port, do:
 $ docker run -e MODEL_SERVICE_PORT=9000 -p 9000:9000 model-service
 So this listens on port 9000.
+
+## How to run the backend container with a volume mount
+
+When running with the first command given above -> $ docker run -p 8081:8081 model-service
+there is no model provided so the docker file will download one from github releases (provided by F9)
+For example from this link: [https://github.com/doda25-team11/model-service/releases/tag/model-20251118-102052]
+
+To run with a volume mount, run the following command:
+ $ docker run \                         
+  -p 8081:8081 \\
+  -v (path to folder with models):/app/model \\
+  model-service
+
+where the folder with models can be something like: backend/models that contains at least the following files:
+- model.joblib
+- preprocessor.joblib
