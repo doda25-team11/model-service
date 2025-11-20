@@ -61,5 +61,6 @@ def predict():
     return jsonify(res)
 
 if __name__ == '__main__':
+    port = int(os.environ.get("MODEL_SERVICE_PORT", 8081))
     #clf = joblib.load('output/model.joblib')
-    app.run(host="0.0.0.0", port=8081, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)

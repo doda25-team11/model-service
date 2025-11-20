@@ -32,6 +32,8 @@ VOLUME ["/app/model"]
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-EXPOSE 8081
+ENV MODEL_SERVICE_PORT=8081
+
+EXPOSE ${MODEL_SERVICE_PORT}
 
 ENTRYPOINT ["/app/entrypoint.sh"]
