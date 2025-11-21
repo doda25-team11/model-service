@@ -26,16 +26,11 @@ ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 RUN echo "Building on $BUILDPLATFORM for $TARGETPLATFORM"
 
+
 WORKDIR /app
 
-# Create output directory for trained model and artifacts
-RUN mkdir -p /app/output
-
-# Copy virtual environment, source code and training data
+# Copy virtual environment from first stage
 COPY --from=deps-builder /venv /venv
-COPY ./src /app/src
-COPY ./smsspamcollection /app/smsspamcollection
-
 ENV PATH="/venv/bin:$PATH"
 
 # Run the training scripts
@@ -50,18 +45,15 @@ ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 RUN echo "Building on $BUILDPLATFORM for $TARGETPLATFORM"
 
-WORKDIR /app
+# Add model directory as a volume
+VOLUME ["/app/model"]
 
-# Copy virtual environment, trained model and source code for serving
-COPY --from=deps-builder /venv /venv
-COPY --from=train /app/output /app/output
-COPY ./src/serve_model.py ./src/text_preprocessing.py /app/src/
-
-ENV PATH="/venv/bin:$PATH"
+# Copy startup script and make it executable
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 ENV MODEL_SERVICE_PORT=8081
 
 EXPOSE ${MODEL_SERVICE_PORT}
 
-# Run the main python file when the container starts
-ENTRYPOINT ["python", "/app/src/serve_model.py"]
+ENTRYPOINT ["/app/entrypoint.sh"]

@@ -1,0 +1,57 @@
+name: Train and Release Model
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+
+jobs:
+  train-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install --no-cache-dir -r requirements.txt
+
+      - name: Create output directory
+        run: mkdir -p backend/output
+
+      - name: Run training pipeline
+        run: |
+          cd backend
+          python src/read_data.py
+          python src/text_preprocessing.py
+          python src/text_classification.py
+
+      - name: Generate version
+        id: version
+        run: echo "VERSION=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: model-${{ env.VERSION }}
+          release_name: "Model Release ${{ env.VERSION }}"
+          draft: false
+          prerelease: false
+
+      # Upload trained model files to the Release. Currently, all files are being uploaded, we could change that.
+      - name: Upload model artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: model-${{ env.VERSION }}
+          files: |
+            backend/output/*
